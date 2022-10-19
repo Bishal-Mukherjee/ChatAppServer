@@ -23,6 +23,10 @@ mongoose
     console.log(err);
   });
 
+app.get("/", (req, res) => {
+  return res.status(200).json({ message: "SERVER WORKING" });
+});
+
 app.use("/api/users", require("./routes/users"));
 app.use("/api/rooms", require("./routes/rooms"));
 
