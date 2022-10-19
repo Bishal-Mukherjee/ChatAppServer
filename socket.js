@@ -18,8 +18,15 @@ const socket_connection = ({ io }) => {
         startConvsersation({ ...params }).then((res) => {
           if (res) {
             // res: roomId, primaryEmail, secondaryEmail
+            const { roomId, primaryEmail, secondaryEmail } = res;
             socket.join(res.roomId);
-            io.to(res.roomId).emit("roomid_found", { ...res });
+            io.to(res.roomId).emit("roomid_found", {
+              roomId,
+              primaryEmail,
+              secondaryEmail,
+              name: params.name, // name refers to the user to whom the message is to be sent
+              email: params.email, // email refers to the user to whom the message is to be sent
+            });
           }
         });
       }
@@ -85,13 +92,17 @@ const socket_connection = ({ io }) => {
     });
 
     socket.on("getchat", (params) => {
-      console.log("getchat triggered", params);
-      getRoomChat({ ...params }).then((res) => {
-        socket.emit("getchat", {
-          messages: res.messages,
-          flag: "messages_fetched",
+      try {
+        console.log("getchat triggered", params);
+        getRoomChat({ ...params }).then((res) => {
+          socket.emit("getchat", {
+            messages: res.messages,
+            flag: "messages_fetched",
+          });
         });
-      });
+      } catch (err) {
+        console.log(err);
+      }
     });
 
     socket.on("roomcreation", (params) => {
